@@ -19,9 +19,51 @@ def main():
     output_file_name = sys.argv[2]
     output_file_path = os.path.abspath(output_file_name)
 
+    # Check for input file existence
     if not os.path.exists(input_file_path):
         sys.stderr.write(f"Missing {input_file_name}\n")
         sys.exit(1)
+
+    # Read input file lines as a list
+    with open(input_file_path, "r", encoding="utf-8") as file:
+        elements = file.readlines()
+
+    headings = {
+        "#": "h1",
+        "##": "h2",
+        "###": "h3",
+        "####": "h4",
+        "#####": "h5",
+        "######": "h6",
+    }
+
+    parsed = []
+
+    for line in elements:
+        line = line.strip()
+
+        # Ignore empty lines
+        if len(line) == 1:
+            continue
+
+        content = line.split(" ")
+
+        # Ignore tag only
+        if len(content) == 1:
+            continue
+
+        tag = content[0]
+        text = " ".join(content[1:])
+
+        # Ignore invalid tag
+        if not tag in headings.keys():
+            continue
+
+        parsed.append(f"<{headings[tag]}>{text}<{headings[tag]}>\n")
+
+    # Write output file
+    with open(output_file_path, "w", encoding="utf-8") as file:
+        file.write("".join(parsed))
 
     sys.exit(0)
 
