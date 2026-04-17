@@ -74,6 +74,10 @@ def main():
 
             parsed.append(f"<li>{text}</li>\n")
 
+    # Close unordered list if necessary
+    if ul_active:
+        parsed.append("</ul>\n")
+
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
         file.write("".join(parsed))
