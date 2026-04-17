@@ -4,6 +4,7 @@ markdown2html.py
 Script generating HTML from Markdown syntax.
 """
 
+import hashlib
 import os
 import re
 import sys
@@ -130,15 +131,25 @@ def main():
 
     result = "".join(parsed)
 
-    # Bold text (**)
+    # Bold text: **<text>**
     bold = re.findall(r"\*\*[\s\S]*?\*\*", result)
     for element in bold:
         result = result.replace(element, f"<b>{element[2:-2]}</b>")
 
-    # Emphasis text (__)
+    # Emphasis text: __<text>__
     emphasis = re.findall(r"\_\_[\s\S]*?\_\_", result)
     for element in emphasis:
         result = result.replace(element, f"<em>{element[2:-2]}</em>")
+
+    # Parenthesis text (C/c Removal): ((<text>))
+    parenthesis = re.findall(r"\(\([\s\S]*?\)\)", result)
+    for element in parenthesis:
+        result = result.replace(element, re.sub(r"c|C", "", element[2:-2]))
+
+    # Bracket text (MD5 Hash): [[<text>]]
+    bracket = re.findall(r"\[\[[\s\S]*?\]\]", result)
+    for element in bracket:
+        result = result.replace(element, hashlib.md5(element[2:-2].encode()).hexdigest())
 
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
