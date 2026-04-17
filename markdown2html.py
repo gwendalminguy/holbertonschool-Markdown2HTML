@@ -5,6 +5,7 @@ Script generating HTML from Markdown syntax.
 """
 
 import os
+import re
 import sys
 
 
@@ -127,9 +128,21 @@ def main():
     if p_active:
         parsed.append("</p>\n")
 
+    result = "".join(parsed)
+
+    # Bold text (**)
+    bold = re.findall(r"\*\*[\s\S]*?\*\*", result)
+    for element in bold:
+        result = result.replace(element, f"<b>{element[2:-2]}</b>")
+
+    # Emphasis text (__)
+    emphasis = re.findall(r"\_\_[\s\S]*?\_\_", result)
+    for element in emphasis:
+        result = result.replace(element, f"<em>{element[2:-2]}</em>")
+
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
-        file.write("".join(parsed))
+        file.write(result)
 
     sys.exit(0)
 
