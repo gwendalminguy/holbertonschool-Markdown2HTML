@@ -38,6 +38,7 @@ def main():
     }
 
     parsed = []
+    ul_active = False
 
     for line in elements:
         line = line.strip()
@@ -55,11 +56,23 @@ def main():
         tag = content[0]
         text = " ".join(content[1:])
 
-        # Ignore invalid tag
-        if tag not in headings.keys():
+        # Close unordered list if necessary
+        if ul_active and tag != "-":
+            parsed.append("</ul>\n")
+
+        # Heading tag
+        if tag in headings.keys():
+            parsed.append(f"<{headings[tag]}>{text}</{headings[tag]}>\n")
             continue
 
-        parsed.append(f"<{headings[tag]}>{text}</{headings[tag]}>\n")
+        # List tag
+        if tag == "-":
+            # Start unordered list
+            if not ul_active:
+                parsed.append("<ul>\n")
+                ul_active = True
+
+            parsed.append(f"<li>{text}</li>\n")
 
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
