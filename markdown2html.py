@@ -38,24 +38,35 @@ def main():
     }
 
     parsed = []
+    
     ul_active = False
     ol_active = False
+    p_active = False
 
     for line in elements:
         line = line.strip()
 
         # Ignore empty lines
-        if len(line) == 1:
+        if len(line) < 1:
+            # Close paragraph if necessary
+            if p_active:
+                parsed.append("</p>\n")
+                p_active = False
             continue
 
         content = line.split(" ")
 
+        tag = content[0] if content[0] in headings.keys() or content[0] in ["-", "*"] else None
+
         # Ignore tag only
-        if len(content) == 1:
+        if tag and len(content) == 1:
+            # Close paragraph if necessary
+            if p_active:
+                parsed.append("</p>\n")
+                p_active = False
             continue
 
-        tag = content[0]
-        text = " ".join(content[1:])
+        text = " ".join(content[1:]) if tag else " ".join(content)
 
         # Close unordered list if necessary
         if ul_active and tag != "-":
@@ -67,13 +78,18 @@ def main():
             parsed.append("</ol>\n")
             ol_active = False
 
+        # Close paragraph if necessary
+        if p_active and tag:
+            parsed.append("</p>\n")
+            p_active = False
+
         # Heading tag
         if tag in headings.keys():
             parsed.append(f"<{headings[tag]}>{text}</{headings[tag]}>\n")
             continue
 
         # Unordered list tag
-        if tag == "-":
+        elif tag == "-":
             # Start unordered list
             if not ul_active:
                 parsed.append("<ul>\n")
@@ -90,6 +106,15 @@ def main():
 
             parsed.append(f"<li>{text}</li>\n")
 
+        # Paragraph
+        elif not tag:
+            if not p_active:
+                parsed.append("<p>\n")
+                p_active = True
+            else:
+                parsed.append("<br>\n")
+            parsed.append(f"{text}\n")
+
     # Close unordered list if necessary
     if ul_active:
         parsed.append("</ul>\n")
@@ -97,6 +122,10 @@ def main():
     # Close ordered list if necessary
     if ol_active:
         parsed.append("</ol>\n")
+
+    # Close paragraph if necessary
+    if p_active:
+        parsed.append("</p>\n")
 
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
