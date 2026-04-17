@@ -59,6 +59,7 @@ def main():
         # Close unordered list if necessary
         if ul_active and tag != "-":
             parsed.append("</ul>\n")
+            ul_active = False
 
         # Heading tag
         if tag in headings.keys():
