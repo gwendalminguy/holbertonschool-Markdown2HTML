@@ -56,10 +56,10 @@ def main():
         text = " ".join(content[1:])
 
         # Ignore invalid tag
-        if not tag in headings.keys():
+        if tag not in headings.keys():
             continue
 
-        parsed.append(f"<{headings[tag]}>{text}<{headings[tag]}>\n")
+        parsed.append(f"<{headings[tag]}>{text}</{headings[tag]}>\n")
 
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
