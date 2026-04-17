@@ -1,2 +1,2 @@
-# holbertonschool-Markdown2HTML
-This repository focuses on generating HTML from Markdown syntax.
+## Markdown2HTML
+This is the Markdown2HTML repository.
