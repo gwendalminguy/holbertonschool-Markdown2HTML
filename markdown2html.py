@@ -39,6 +39,7 @@ def main():
 
     parsed = []
     ul_active = False
+    ol_active = False
 
     for line in elements:
         line = line.strip()
@@ -61,12 +62,17 @@ def main():
             parsed.append("</ul>\n")
             ul_active = False
 
+        # Close ordered list if necessary
+        if ol_active and tag != "*":
+            parsed.append("</ol>\n")
+            ol_active = False
+
         # Heading tag
         if tag in headings.keys():
             parsed.append(f"<{headings[tag]}>{text}</{headings[tag]}>\n")
             continue
 
-        # List tag
+        # Unordered list tag
         if tag == "-":
             # Start unordered list
             if not ul_active:
@@ -75,9 +81,22 @@ def main():
 
             parsed.append(f"<li>{text}</li>\n")
 
+        # Ordered list tag
+        elif tag == "*":
+            # Start ordered list
+            if not ol_active:
+                parsed.append("<ol>\n")
+                ol_active = True
+
+            parsed.append(f"<li>{text}</li>\n")
+
     # Close unordered list if necessary
     if ul_active:
         parsed.append("</ul>\n")
+
+    # Close ordered list if necessary
+    if ol_active:
+        parsed.append("</ol>\n")
 
     # Write output file
     with open(output_file_path, "w", encoding="utf-8") as file:
