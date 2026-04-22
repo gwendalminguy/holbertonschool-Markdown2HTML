@@ -49,7 +49,17 @@ def main():
         line = line.strip()
 
         # Ignore empty lines
-        if len(line) < 1:
+        if len(line) <= 1:
+            # Close unordered list if necessary
+            if ul_active:
+                parsed.append("</ul>\n")
+                ul_active = False
+
+            # Close ordered list if necessary
+            if ol_active:
+                parsed.append("</ol>\n")
+                ol_active = False
+
             # Close paragraph if necessary
             if p_active:
                 parsed.append("</p>\n")
